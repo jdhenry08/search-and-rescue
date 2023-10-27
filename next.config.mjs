@@ -8,6 +8,7 @@ await import("./src/env.mjs");
 const config = {
   reactStrictMode: true,
   output: "export",
+  images: { unoptimized: true }
 };
 
 export default config;
