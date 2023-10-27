@@ -25,9 +25,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       </Head>
 
       <main className="h-screen">
+        {Component.Layout ? 
         <Component.Layout>
           <Component {...pageProps} />
-        </Component.Layout>
+        </Component.Layout> : <Component {...pageProps} />}
       </main>
     </>
   );

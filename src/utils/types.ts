@@ -4,7 +4,7 @@ import { type AppProps } from "next/app";
 
 export type AppPropsWithLayout = AppProps & {
   Component: NextPage & {
-    Layout: (props: PropsWithChildren) => JSX.Element;
+    Layout?: (props: PropsWithChildren) => JSX.Element;
   };
 };
 
