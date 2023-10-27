@@ -1,59 +1,99 @@
-import Image from "next/image";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import z from "zod";
 
-import { Label } from "~/components/ui/label";
-import { Input } from "~/components/ui/input";
+import { fetchAPI } from "~/utils/api";
+import LoginLayout from "~/layouts/login";
+
 import { Button } from "~/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
 
-import login from "public/login.jpg";
+const formSchema = z.object({
+  name: z.string().min(1, "Please enter your name"),
+  email: z
+    .string({ required_error: "Please enter your email address" })
+    .email("Please enter a valid email address"),
+});
 
-export default function Home() {
+export default function Login() {
+  const router = useRouter();
+
+  const loginForm = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    // Setting these to empty strings prevents uncontrolled > controlled input errors
+    defaultValues: {
+      name: "",
+      email: "",
+    },
+  });
+
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    await fetchAPI("auth/login", {
+      method: "POST",
+      body: data,
+      router,
+    });
+
+    void router.push("/");
+  }
+
   return (
-    <div className="flex min-h-screen">
-      <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-        <form
-          action="#"
-          method="POST"
-          className="mx-auto w-full max-w-sm space-y-8 lg:w-96"
-        >
-          <h2 className="text-2xl font-bold tracking-tight">
-            Please sign in to your account
-          </h2>
+    <Form {...loginForm}>
+      <form
+        className="mx-auto w-full max-w-sm space-y-6 lg:w-96"
+        onSubmit={loginForm.handleSubmit(onSubmit)}
+      >
+        <h2 className="text-2xl font-bold tracking-tight text-accent">
+          Please sign in to your account
+        </h2>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-            />
-          </div>
+        <FormField
+          control={loginForm.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="space-y-2">
+              <FormLabel>Name</FormLabel>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-            />
-          </div>
+              <FormControl>
+                <Input placeholder="Bark Ruffalo" {...field} />
+              </FormControl>
 
-          <Button type="submit" className="w-full">
-            Sign in
-          </Button>
-        </form>
-      </div>
-
-      <div className="relative hidden w-0 flex-1 lg:block">
-        <Image
-          className="absolute h-full w-full object-cover"
-          src={login}
-          alt=""
+              <FormMessage>&nbsp;</FormMessage>
+            </FormItem>
+          )}
         />
-      </div>
-    </div>
+
+        <FormField
+          control={loginForm.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="space-y-2">
+              <FormLabel>Email</FormLabel>
+
+              <FormControl>
+                <Input placeholder="bark.ruffalo@example.com" {...field} />
+              </FormControl>
+
+              <FormMessage>&nbsp;</FormMessage>
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" variant="accent" className="w-full">
+          Sign in
+        </Button>
+      </form>
+    </Form>
   );
 }
+
+Login.Layout = LoginLayout;

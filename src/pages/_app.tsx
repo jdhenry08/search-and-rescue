@@ -1,27 +1,34 @@
-import { type AppType } from "next/app";
+import Head from "next/head";
 
 import { Inter } from "next/font/google";
 
-import { api } from "~/utils/api";
+import { type AppPropsWithLayout } from "~/utils/types";
 
 import "~/styles/globals.css";
-import { cn } from "~/utils/helpers";
-import Head from "next/head";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({ subsets: ["latin"] });
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
+      <style global jsx>
+        {`
+          body {
+            --font-sans: ${inter.style.fontFamily};
+          }
+        `}
+      </style>
+
       <Head>
         <title>Search & Rescue</title>
+        <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={cn("min-h-screen font-sans", inter.variable)}>
-        <Component {...pageProps} />
+      <main className="h-screen">
+        <Component.Layout>
+          <Component {...pageProps} />
+        </Component.Layout>
       </main>
     </>
   );
-};
-
-export default api.withTRPC(MyApp);
+}
